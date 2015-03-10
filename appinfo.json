@@ -1,0 +1,23 @@
+{
+    "appKeys": {
+        "test1": 0,
+        "test2": 1
+    },
+    "capabilities": [
+        "configurable"
+    ],
+    "companyName": "khatra10@yahoo.com",
+    "longName": "Time To Do",
+    "projectType": "native",
+    "resources": {
+        "media": []
+    },
+    "sdkVersion": "2",
+    "shortName": "Time To Do",
+    "uuid": "10b4f838-0bd6-49d7-9104-53f60a1eb631",
+    "versionCode": 1,
+    "versionLabel": "1.0",
+    "watchapp": {
+        "watchface": false
+    }
+}
