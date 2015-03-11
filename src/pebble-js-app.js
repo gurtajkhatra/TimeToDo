@@ -1,21 +1,10 @@
-//var jsonObj = {0:"Add some tasks from the configuration page!", 1: 0};
+var jsonObj = {0:"Shsj",1:1484, 2:"GARGE", 3:433, 4:"dhishe", 5:32};
 
-/*var transactionId = Pebble.addEventListener("ready", function(e) {
-                        console.log("Done getting Ready");
-                         Pebble.sendAppMessage(jsonObj,
-                                              function(e) {
-                                                console.log('Successfully delivered message with transactionId='+ e.data.transactionId);
-                                               },
-                                                function(e) {
-                                                  console.log('Unable to deliver message with transactionId=' + e.data.transactionId+ ' Error is: ');
-                                                });
-});*/
 
 Pebble.addEventListener('ready',
   function(e) {  
-    console.log("IN READY JAVASCRIPT SHIIIII");
-    Pebble.sendAppMessage({ 0:'This is 21 characters' , 1:543, 2:"Next test", 3:770, 4:'Dishes', 5:333,
-                          });
+    //Pebble.sendAppMessage({ 0:'This is 21 characters' , 1:10, 2:"Next test", 3:770, 4:'Dishes', 5:333,});
+      Pebble.sendAppMessage(jsonObj);
   });
 
                                                
@@ -27,13 +16,33 @@ Pebble.addEventListener("appmessage",
 
 Pebble.addEventListener("showConfiguration",
                        function(e){
-                         Pebble.openURL("http://gurtajkhatra.github.io/TimeToDoConfig.html");
+                         Pebble.openURL("http://gurtajkhatra.github.io/TimeToDo%20configuration%20Page/TimeToDoConfig.html");
                        });
 
+
 Pebble.addEventListener('webviewclosed',
-                       function(e){
-                         var tempJson = JSON.parse(decodeURIComponent(e.response));
-                         console.log(tempJson);
-                         
-                         
-                       });
+  function(e) {
+      var oldJson = jsonObj;
+      var configuration = JSON.parse(decodeURIComponent(e.response));
+      console.log("e.response: " + e.response);
+      console.log("After decoding: " + decodeURIComponent(e.response));
+      console.log("After JSON.parse " + configuration);
+      configuration = JSON.parse(configuration); 
+      jsonObj = '{';
+      for(var i in configuration.tasks) {
+          console.log(configuration.tasks[i].name);
+          console.log(configuration.tasks[i].time);
+          jsonObj = jsonObj + '"' + (2*i) + '"' + ':"' + configuration.tasks[i].name + '",';
+          jsonObj = jsonObj + '"' + (2*i+1) + '"' + ':' + configuration.tasks[i].time + ',';      
+      }
+      
+      jsonObj = jsonObj.substring(0,jsonObj.length-1) + '}';
+      console.log("OLD JSON: " + oldJson);
+      console.log("NEW JSON: " + jsonObj);
+      jsonObj = JSON.parse(jsonObj);
+      
+      Pebble.sendAppMessage(jsonObj);
+      
+  }
+);
+

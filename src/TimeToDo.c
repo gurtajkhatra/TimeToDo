@@ -32,12 +32,12 @@
   
 //Constants for Tasks and Time
 #define MAX_NUMBER_OF_TASKS 20
-
+#define MAX_TASK_STRING_SIZE 21
 
 //COMMUNICATION AND DATA VARIABLES
 char *listOfTasks[MAX_NUMBER_OF_TASKS];
 int listOfTimes[MAX_NUMBER_OF_TASKS];
-int indexToAddAt = 0;
+
 
 //DESIGN OF GRAPHICS AND TEXT VARIABLES:
 
@@ -76,17 +76,14 @@ int totalTasks;
 //Goes through the list of values passed to it, and puts them in the proper array
 void process_tuple(Tuple *t){
   int key = t->key;
-  printf("Key: %d, IndexToAddAt: %d", key, indexToAddAt);
   //If the key is even, its a string, and if the key is odd its the time in seconds
-  if(key%2 == 0){
-    printf("Value: %s", t->value->cstring);
+  if(key%2 == 0){ 
     listOfTasks[key/2] = t->value->cstring;
     totalTasks++;
   }
   else if(key%2 != 0){
     printf("Value: %d", t->value->uint16);
     listOfTimes[key/2] = t->value->uint16;
-    indexToAddAt += 1;
   }
 }
  
@@ -101,6 +98,7 @@ void inbox(DictionaryIterator *iter, void *context){
       process_tuple(t);
     }
   }
+  initialized = 0;
 }
 
 //Sets the variables for the name of the task and time for it, 
@@ -114,8 +112,6 @@ void setTaskAndTime(int taskNumber){
   if (taskName == NULL) {
     initialized = 0;
   }
-  //APP_LOG(APP_LOG_LEVEL_INFO, "%s, %d", taskName, initalTime);
-  
 }
 
 //FUNCTIONS FOR DRAWING ON PEBBLE SCREEN
@@ -156,6 +152,7 @@ void setTimeAndTaskLayers(){
 void timerCallback(){
   if(!initialized){
     initialized = 1;
+    barCurrentWidth = TIMER_BAR_INITAL_WIDTH;
     setTaskAndTime(currentTask);
     setTimeAndTaskLayers();
     timerTimer = app_timer_register(100, timerCallback, NULL);
@@ -174,6 +171,9 @@ void timerCallback(){
     layer_mark_dirty(barLayer);
   }
   else {
+    barCurrentWidth = 0;
+    layer_mark_dirty(barLayer);
+    vibes_long_pulse();
     //If currently on the last task on the list
     if(currentTask == (totalTasks-1)) {
     //set the current task to the first one
@@ -184,6 +184,7 @@ void timerCallback(){
     }
     clockRunning = 0;
     initialized = 0;
+    timerTimer = app_timer_register(1000, timerCallback, NULL);
   }
 }
 
@@ -240,6 +241,7 @@ void config_provider(Window *window) {
 
 
 void init(){
+  totalTasks = 0;  
   //Set up communications with Website
    app_message_open(app_message_inbox_size_maximum(), app_message_outbox_size_maximum());
   app_message_register_inbox_received(inbox);
